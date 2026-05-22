@@ -5,6 +5,7 @@ import express, {
   type Response,
 } from "express";
 import { userRoute } from "./modules/user/user.route.js";
+import { issuesRoute } from "./modules/issues/issues.route.js";
 const app: Application = express();
 
 // middleware
@@ -15,5 +16,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/auth", userRoute);
+app.use("/api/issues", issuesRoute);
 
 export default app;

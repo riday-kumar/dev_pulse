@@ -2,18 +2,7 @@ import { pool } from "../../db/index.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import config from "../../config/index.js";
-
-interface IUser {
-  name: string;
-  email: string;
-  password: string;
-  role?: "contributor" | "maintainer";
-}
-
-interface ISignin {
-  email: string;
-  password: string;
-}
+import type { ISignin, IUser } from "../../types/index.js";
 
 const userRegisterIntoDB = async (payLoad: IUser) => {
   const { name, email, password, role } = payLoad;
