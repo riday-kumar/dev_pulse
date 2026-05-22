@@ -8,6 +8,12 @@ interface IPostIssue {
   reporter_id: number;
 }
 
+interface IQuery {
+  type: string;
+  status: string;
+  sort: string;
+}
+
 const createIssuesIntoDB = async (payLoad: IPostIssue) => {
   const { title, description, type, reporter_id } = payLoad;
   console.log(payLoad);
@@ -23,14 +29,22 @@ const createIssuesIntoDB = async (payLoad: IPostIssue) => {
   return result;
 };
 
-const getAllIssuesFromDB = async () => {
-  const result = await pool.query(`
+const getAllIssuesFromDB = async (query: IQuery) => {
+  const { type, status, sort } = query;
+  let organize: string = "DESC";
+  if (sort == "oldest") {
+    organize = "ASC";
+  }
+
+  const result = await pool.query(
+    `
          SELECT 
         issues.id,
         issues.title,
         issues.description,
         issues.type,
         issues.status,
+
         json_build_object(
           'id', users.id,
           'name', users.name,
@@ -39,12 +53,16 @@ const getAllIssuesFromDB = async () => {
         issues.created_at,
         issues.updated_at
 
-      FROM issues
+      FROM issues 
 
       LEFT JOIN users
-      ON issues.reporter_id = users.id
+      ON issues.reporter_id = users.id WHERE (issues.type = $1 OR $1 IS NULL) 
+      AND (issues.status = $2 OR $2 IS NULL)
+    ORDER BY issues.created_at  ${organize}
 
-        `);
+        `,
+    [type, status],
+  );
   return result;
 };
 
