@@ -1,4 +1,5 @@
 import { pool } from "../../db/index.js";
+import type { IUser } from "../../types/index.js";
 
 interface IPostIssue {
   title: string;
@@ -22,6 +23,32 @@ const createIssuesIntoDB = async (payLoad: IPostIssue) => {
   return result;
 };
 
+const getAllIssuesFromDB = async () => {
+  const result = await pool.query(`
+         SELECT 
+        issues.id,
+        issues.title,
+        issues.description,
+        issues.type,
+        issues.status,
+        json_build_object(
+          'id', users.id,
+          'name', users.name,
+          'role', users.role
+        ) AS reporter,
+        issues.created_at,
+        issues.updated_at
+
+      FROM issues
+
+      LEFT JOIN users
+      ON issues.reporter_id = users.id
+
+        `);
+  return result;
+};
+
 export const issuesService = {
   createIssuesIntoDB,
+  getAllIssuesFromDB,
 };
