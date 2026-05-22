@@ -1,18 +1,5 @@
 import { pool } from "../../db/index.js";
-import type { IUser } from "../../types/index.js";
-
-interface IPostIssue {
-  title: string;
-  description: string;
-  type: "bug" | "feature_request";
-  reporter_id: number;
-}
-
-interface IQuery {
-  type: string;
-  status: string;
-  sort: string;
-}
+import type { IPostIssue, IQuery } from "./issues.interface.js";
 
 const createIssuesIntoDB = async (payLoad: IPostIssue) => {
   const { title, description, type, reporter_id } = payLoad;
@@ -36,34 +23,41 @@ const getAllIssuesFromDB = async (query: IQuery) => {
     organize = "ASC";
   }
 
-  const result = await pool.query(
-    `
-         SELECT 
-        issues.id,
-        issues.title,
-        issues.description,
-        issues.type,
-        issues.status,
+  const allIssues = (
+    await pool.query(
+      `
+        SELECT * FROM issues
+        WHERE (type = $1 OR $1 IS NULL) AND
+        (status = $2 OR $2 IS NULL)
+        ORDER BY created_at  ${organize}
+    
+    `,
+      [type, status],
+    )
+  ).rows;
 
-        json_build_object(
-          'id', users.id,
-          'name', users.name,
-          'role', users.role
-        ) AS reporter,
-        issues.created_at,
-        issues.updated_at
-
-      FROM issues 
-
-      LEFT JOIN users
-      ON issues.reporter_id = users.id WHERE (issues.type = $1 OR $1 IS NULL) 
-      AND (issues.status = $2 OR $2 IS NULL)
-    ORDER BY issues.created_at  ${organize}
-
-        `,
-    [type, status],
+  const allReportersId = allIssues.map(
+    (singleIssue) => singleIssue.reporter_id,
   );
-  return result;
+  const uniqueReportersId = [...new Set(allReportersId)];
+  //   console.log(uniqueReportersId);
+
+  const allReportedUsers = (
+    await pool.query(`SELECT id, name, role FROM users WHERE id = ANY($1)`, [
+      uniqueReportersId,
+    ])
+  ).rows;
+
+  const issuesWithReporters = allIssues.map((issue) => {
+    const reporter = allReportedUsers.find(
+      (user) => user.id === issue.reporter_id,
+    );
+
+    return { ...issue, reporter };
+  });
+
+  //   console.log(issuesWithReporters);
+  return issuesWithReporters;
 };
 
 export const issuesService = {
