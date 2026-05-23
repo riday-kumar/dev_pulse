@@ -11,3 +11,9 @@ export interface ISignin {
 }
 
 export type ROLES = "contributor" | "maintainer";
+
+export type TUser = {
+  id: number;
+  name: string;
+  role: string;
+};

@@ -21,4 +21,7 @@ router.patch(
   issuesController.updateIssue,
 );
 
+//protected
+router.delete("/:id", auth("maintainer"), issuesController.deleteIssue);
+
 export const issuesRoute = router;

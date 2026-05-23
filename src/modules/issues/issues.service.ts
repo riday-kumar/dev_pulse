@@ -1,8 +1,8 @@
 import { pool } from "../../db/index.js";
 import type { IPostIssue, IQuery } from "./issues.interface.js";
 
-const createIssuesIntoDB = async (payLoad: IPostIssue) => {
-  const { title, description, type, reporter_id } = payLoad;
+const createIssuesIntoDB = async (payLoad: IPostIssue, reporter_id: number) => {
+  const { title, description, type } = payLoad;
   console.log(payLoad);
   const result = await pool.query(
     `
@@ -116,15 +116,14 @@ const getSingleIssueFromDB = async (id: string) => {
   return result;
 };
 
-const updateIssueFromDB = async (id: string, payLoad: IPostIssue) => {
+const updateIssueFromDB = async (
+  id: string,
+  payLoad: IPostIssue,
+  reporter_id: number,
+  reporter_role: string,
+) => {
   // console.log(id, payLoad);
-  const {
-    title,
-    description,
-    type,
-    reporter_id: userId,
-    reporter_role: userRole,
-  } = payLoad;
+  const { title, description, type } = payLoad;
 
   const selectedIssue = (
     await pool.query(`
@@ -132,7 +131,7 @@ const updateIssueFromDB = async (id: string, payLoad: IPostIssue) => {
     `)
   ).rows[0];
 
-  if (userRole === "maintainer") {
+  if (reporter_role === "maintainer") {
     const updateIssueByMaintainer = pool.query(
       `
       UPDATE issues SET title = COALESCE($1,title) , description = COALESCE($2,description),
@@ -145,8 +144,8 @@ const updateIssueFromDB = async (id: string, payLoad: IPostIssue) => {
   }
 
   if (
-    userRole === "contributor" &&
-    selectedIssue.reporter_id === userId &&
+    reporter_role === "contributor" &&
+    selectedIssue.reporter_id === reporter_id &&
     selectedIssue.status === "open"
   ) {
     const updateIssueByContributor = pool.query(
@@ -163,9 +162,21 @@ const updateIssueFromDB = async (id: string, payLoad: IPostIssue) => {
   }
 };
 
+const deleteIssueFromDB = async (id: string) => {
+  const result = await pool.query(
+    `
+    DELETE FROM issues WHERE id = $1
+    `,
+    [id],
+  );
+  console.log("from delete service", result);
+  return result;
+};
+
 export const issuesService = {
   createIssuesIntoDB,
   getAllIssuesFromDB,
   getSingleIssueFromDB,
   updateIssueFromDB,
+  deleteIssueFromDB,
 };
