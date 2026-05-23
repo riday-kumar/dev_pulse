@@ -1,27 +1,42 @@
-## Project Name : DEV_PULSE
+## DEV_PULSE
 
-## Live URL : https://dev-pulse-issue-find.vercel.app
+## Live URL 
+### https://dev-pulse-issue-find.vercel.app
 
 
-## Features
+# Features
 
 ## 👥 User Roles & Permissions
 
-| Role            | Allowed Actions                                                                                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **contributor** | • Register and log in<br>• Create new issues (bug or feature request)<br>• View all issues                                                                          |
-| **maintainer**  | • All contributor permissions<br>• Update any issue field<br>• Delete any issue<br>• Change issue workflow status independently<br> |
+### Contributor
+#### Contributor can:
+- Register and authenticate their accounts
+- Create new issues (bug reports or feature requests)
+- View all submitted issues
 
+### Maintainer can:
+#### Maintainers have all contributor privileges, plus the ability to:
+- Update any issue details
+- Delete issues
+- Manage and change issue workflow statuses independently
 
 
 ---
 
 ## 🔐 Authentication & Authorization System
 
-- **JWT Flow:** Client sends credentials → Server validates & hashes/compares → Server returns signed JWT → Client attaches token to `Authorization: <token>` header → Server verifies signature & expiry before processing.
-- **Security:**
-  - Protected endpoints reject requests without a valid JWT.
-  - Role verification occurs before privileged operations.
+**JWT-Based Authentication Flow:**
++ The client submits login credentials
++ The server validates user information and verifies hashed passwords
++ A signed JWT token is generated and returned to the client
++ The client includes the token in the Authorization header for protected requests
++ The server verifies the token’s validity and expiration before processing the request
+
+**Security Features :**
+- Protected routes require a valid JWT token
+- Role-based access control (RBAC) is enforced before privileged actions are executed
+- Passwords are securely hashed before storage
+- Unauthorized requests are rejected automatically
 
 ---
 
