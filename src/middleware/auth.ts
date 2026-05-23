@@ -27,8 +27,8 @@ const auth = (...roles: ROLES[]) => {
         config.secret as string,
       ) as JwtPayload;
 
-      console.log(decodeToken);
-      console.log(roles);
+      // console.log(decodeToken);
+      // console.log(roles);
 
       // console.log("decoded token", decodeToken);
       // if token is wrong it will go to catch

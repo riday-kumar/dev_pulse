@@ -3,7 +3,7 @@ import type { IPostIssue, IQuery } from "./issues.interface.js";
 
 const createIssuesIntoDB = async (payLoad: IPostIssue, reporter_id: number) => {
   const { title, description, type } = payLoad;
-  console.log(payLoad);
+  // console.log(payLoad);
   const result = await pool.query(
     `
         INSERT INTO issues(title, description, type, reporter_id)
@@ -131,6 +131,10 @@ const updateIssueFromDB = async (
     `)
   ).rows[0];
 
+  if (!selectedIssue) {
+    throw new Error("issue not found");
+  }
+
   if (reporter_role === "maintainer") {
     const updateIssueByMaintainer = pool.query(
       `
@@ -163,13 +167,24 @@ const updateIssueFromDB = async (
 };
 
 const deleteIssueFromDB = async (id: string) => {
+  const selectedIssue = (
+    await pool.query(`
+    SELECT * FROM issues WHERE id = ${id}
+    `)
+  ).rows[0];
+
+  if (!selectedIssue) {
+    throw new Error("issue not found");
+  }
+
   const result = await pool.query(
     `
     DELETE FROM issues WHERE id = $1
     `,
     [id],
   );
-  console.log("from delete service", result);
+
+  // console.log("from delete service", result);
   return result;
 };
 
