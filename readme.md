@@ -3,6 +3,7 @@
 ## Live URL : https://dev-pulse-issue-find.vercel.app
 
 ---
+## Features
 
 ## 👥 User Roles & Permissions
 
@@ -19,7 +20,6 @@
 
 - **JWT Flow:** Client sends credentials → Server validates & hashes/compares → Server returns signed JWT → Client attaches token to `Authorization: <token>` header → Server verifies signature & expiry before processing.
 - **Security:**
-  - Passwords are never exposed in responses or logs.
   - Protected endpoints reject requests without a valid JWT.
   - Role verification occurs before privileged operations.
 
@@ -35,11 +35,43 @@
 | TypeScript   | Version 6.0.3                                                                 |
 | Express.js   | Modular router architecture                                                   |
 | PostgreSQL   | Relational database, native `pg` driver only                                  |
-| Raw SQL      | Direct `pool.query()` calls, absolutely no query builders, ORMs, or SQL JOINs |
-| bcrypt       | Password hashing, salt rounds between 8 and 12                                |
+| Raw SQL      | Direct `pool.query()` calls |
+| bcrypt       | Password hashing, salt rounds 10                                |
 | jsonwebtoken | JWT generation & verification (standard tokens)                               |
 
 ---
+
+## Setup Steps
+**1. Clone The Repository** <br>
+
+   `
+   git clone https://github.com/riday-kumar/dev_pulse.git
+   `
+   <br>
+   
+**2. Move To Your Project Directory** <br>
+
+`cd dev_pluse`
+<br>
+
+**3. Install All The Dependencies** <br>
+
+`npm install`
+<br>
+
+**4. Create .env File** <br>
+```
+PORT=5000
+CONNECTION_STRING=your_database_url
+SECRET=your_secret_key
+
+```
+<br>
+
+**5. Run The Project**<br>
+
+`npm run dev`
+
 
 ## 🗄️ Database Schema Design
 
