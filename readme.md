@@ -1,6 +1,6 @@
 ## Project Name : DEV_PULSE
 
-## Live URL :
+## Live URL : https://dev-pulse-issue-find.vercel.app
 
 ---
 
