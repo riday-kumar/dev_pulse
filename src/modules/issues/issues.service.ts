@@ -4,7 +4,7 @@ import type { IPostIssue, IQuery } from "./issues.interface.js";
 const createIssuesIntoDB = async (payLoad: IPostIssue) => {
   const { title, description, type, reporter_id } = payLoad;
   console.log(payLoad);
-  const result = pool.query(
+  const result = await pool.query(
     `
         INSERT INTO issues(title, description, type, reporter_id)
         VALUES($1,$2,$3,$4)
@@ -53,14 +53,71 @@ const getAllIssuesFromDB = async (query: IQuery) => {
       (user) => user.id === issue.reporter_id,
     );
 
-    return { ...issue, reporter };
+    const result = {
+      id: issue.id,
+      title: issue.title,
+      description: issue.description,
+      type: issue.type,
+      status: issue.status,
+      reporter: {
+        id: reporter.id,
+        name: reporter.name,
+        role: reporter.role,
+      },
+      created_at: issue.created_at,
+      updated_at: issue.updated_at,
+    };
+
+    return result;
   });
 
   //   console.log(issuesWithReporters);
   return issuesWithReporters;
 };
 
+const getSingleIssueFromDB = async (id: string) => {
+  // console.log(id);
+
+  const singleIssue = (
+    await pool.query(
+      `
+        SELECT * FROM issues WHERE id = $1
+        `,
+      [id],
+    )
+  ).rows[0];
+
+  if (!singleIssue) {
+    throw new Error("No Issue Found");
+  }
+
+  const reporterId = singleIssue.reporter_id;
+  const reporterData = (
+    await pool.query(`
+        SELECT id, name ,role FROM users WHERE id = ${reporterId}
+    `)
+  ).rows[0];
+
+  const result = {
+    id: singleIssue.id,
+    title: singleIssue.title,
+    description: singleIssue.description,
+    type: singleIssue.type,
+    status: singleIssue.status,
+    reporter: {
+      id: reporterData.id,
+      name: reporterData.name,
+      role: reporterData.role,
+    },
+    created_at: singleIssue.created_at,
+    updated_at: singleIssue.updated_at,
+  };
+
+  return result;
+};
+
 export const issuesService = {
   createIssuesIntoDB,
   getAllIssuesFromDB,
+  getSingleIssueFromDB,
 };
