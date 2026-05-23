@@ -14,4 +14,11 @@ router.post(
 router.get("/", issuesController.getAllIssues);
 router.get("/:id", issuesController.getSingleIssue);
 
+//protected
+router.patch(
+  "/:id",
+  auth("contributor", "maintainer"),
+  issuesController.updateIssue,
+);
+
 export const issuesRoute = router;

@@ -3,6 +3,7 @@ export interface IPostIssue {
   description: string;
   type: "bug" | "feature_request";
   reporter_id: number;
+  reporter_role?: string;
 }
 
 export interface IQuery {

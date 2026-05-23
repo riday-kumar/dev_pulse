@@ -30,6 +30,7 @@ const auth = (...roles: ROLES[]) => {
         decodeToken.role === "maintainer"
       ) {
         req.body.reporter_id = decodeToken.id;
+        req.body.reporter_role = decodeToken.role;
         next();
       }
     } catch (error: any) {

@@ -43,7 +43,7 @@ const getSingleIssue = async (req: Request, res: Response) => {
   try {
     const result = await issuesService.getSingleIssueFromDB(id as string);
 
-    console.log("from controller", result);
+    // console.log("from controller", result);
 
     res.status(200).json({
       success: true,
@@ -65,8 +65,38 @@ const getSingleIssue = async (req: Request, res: Response) => {
   }
 };
 
+const updateIssue = async (req: Request, res: Response) => {
+  const id = req.params.id;
+  try {
+    const result = await issuesService.updateIssueFromDB(
+      id as string,
+      req.body,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Issue updated successfully",
+      data: result.rows[0],
+    });
+  } catch (error: any) {
+    if (error.message == "Forbidden") {
+      res.status(403).json({
+        success: false,
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: error.message,
+        errors: error,
+      });
+    }
+  }
+};
+
 export const issuesController = {
   createIssues,
   getAllIssues,
   getSingleIssue,
+  updateIssue,
 };

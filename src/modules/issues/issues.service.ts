@@ -116,8 +116,56 @@ const getSingleIssueFromDB = async (id: string) => {
   return result;
 };
 
+const updateIssueFromDB = async (id: string, payLoad: IPostIssue) => {
+  // console.log(id, payLoad);
+  const {
+    title,
+    description,
+    type,
+    reporter_id: userId,
+    reporter_role: userRole,
+  } = payLoad;
+
+  const selectedIssue = (
+    await pool.query(`
+    SELECT * FROM issues WHERE id = ${id}
+    `)
+  ).rows[0];
+
+  if (userRole === "maintainer") {
+    const updateIssueByMaintainer = pool.query(
+      `
+      UPDATE issues SET title = COALESCE($1,title) , description = COALESCE($2,description),
+       type = COALESCE($3, type) WHERE id = ${id} RETURNING *
+      
+      `,
+      [title, description, type],
+    );
+    return updateIssueByMaintainer;
+  }
+
+  if (
+    userRole === "contributor" &&
+    selectedIssue.reporter_id === userId &&
+    selectedIssue.status === "open"
+  ) {
+    const updateIssueByContributor = pool.query(
+      `
+      UPDATE issues SET title = COALESCE($1,title) , description = COALESCE($2,description),
+       type = COALESCE($3, type) WHERE id = ${id} RETURNING *
+      
+      `,
+      [title, description, type],
+    );
+    return updateIssueByContributor;
+  } else {
+    throw new Error("Forbidden");
+  }
+};
+
 export const issuesService = {
   createIssuesIntoDB,
   getAllIssuesFromDB,
   getSingleIssueFromDB,
+  updateIssueFromDB,
 };
