@@ -41,8 +41,8 @@ export const initDB = async () => {
             )
         
         `);
-    // console.log("Database Connected  successfully");
+    console.log("Database Connected  successfully");
   } catch (error) {
-    // console.log(error);
+    console.log(error);
   }
 };
