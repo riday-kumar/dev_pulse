@@ -2,7 +2,7 @@
 
 ## Live URL : https://dev-pulse-issue-find.vercel.app
 
----
+
 ## Features
 
 ## 👥 User Roles & Permissions
@@ -10,9 +10,9 @@
 | Role            | Allowed Actions                                                                                                                                                     |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **contributor** | • Register and log in<br>• Create new issues (bug or feature request)<br>• View all issues                                                                          |
-| **maintainer**  | • All contributor permissions<br>• Update any issue field<br>• Delete any issue<br>• Change issue workflow status independently<br>• Access internal system metrics |
+| **maintainer**  | • All contributor permissions<br>• Update any issue field<br>• Delete any issue<br>• Change issue workflow status independently<br> |
 
----
+
 
 ---
 
@@ -22,8 +22,6 @@
 - **Security:**
   - Protected endpoints reject requests without a valid JWT.
   - Role verification occurs before privileged operations.
-
----
 
 ---
 
@@ -77,28 +75,12 @@ SECRET=your_secret_key
 
 ### Table 1: `users`
 
-| Field        | Requirement (Plain Text)                                                                            |
-| ------------ | --------------------------------------------------------------------------------------------------- |
-| `id`         | Auto-incrementing unique identifier for each account                                                |
-| `name`       | Full display name of the team member, must be provided                                              |
-| `email`      | Valid login address, must be unique across all accounts, must be provided                           |
-| `password`   | Encrypted string stored securely, must be provided during registration, never returned in responses |
-| `role`       | Determines system access level, defaults to `contributor`, must be `contributor` or `maintainer`    |
-| `created_at` | Timestamp marking when the account was created, automatically generated on insert                   |
-| `updated_at` | Timestamp marking when the account was last updated, automatically refreshed on update              |
+`id`| `name` | `email` | `password` | `role` | `created_at` | `updated_at`
 
-### Table 2: `issues`
 
-| Field         | Requirement (Plain Text)                                                                                        |
-| ------------- | --------------------------------------------------------------------------------------------------------------- |
-| `id`          | Auto-incrementing unique identifier for each reported item                                                      |
-| `title`       | Short descriptive headline, must be provided, maximum 150 characters                                            |
-| `description` | Detailed explanation of the problem or suggestion, must be provided, minimum 20 characters                      |
-| `type`        | Categorizes the entry, must be either `bug` or `feature_request`                                                |
-| `status`      | Current workflow state, defaults to `open`. Status must be one of: `open`, `in_progress`, `resolved`            |
-| `reporter_id` | References the user who submitted the issue (no foreign key constraint required; validate in application logic) |
-| `created_at`  | Timestamp marking when the issue was created, automatically generated on insert                                 |
-| `updated_at`  | Timestamp marking when the issue was last updated, automatically refreshed on update                            |
+### Table 2: `issues` <br>
+
+`id` | `title` | `description` | `type` | `status` | `reporter_id` |  `created_at` | `updated_at`
 
 ---
 
@@ -110,8 +92,6 @@ SECRET=your_secret_key
 
 **Access:** Public
 
-**Description:** Register a new user account with contributor or maintainer role
-
 **Endpoint**
 
 `POST /api/auth/signup`
@@ -119,8 +99,6 @@ SECRET=your_secret_key
 ### 2. User Login
 
 **Access:** Public
-
-**Description:** Authenticate user and receive JWT token
 
 **Endpoint**
 
@@ -131,8 +109,6 @@ SECRET=your_secret_key
 ### 3. Create Issue
 
 **Access:** Authenticated users (`contributor`, `maintainer`)
-
-**Description:** Create a new bug report or feature request
 
 **Endpoint**
 
@@ -148,8 +124,6 @@ Authorization: <JWT_TOKEN>
 
 **Access:** Public
 
-**Description:** Retrieve all issues with optional sorting and filtering
-
 **Endpoint**
 
 `GET /api/issues?sort=newest`
@@ -158,8 +132,6 @@ Authorization: <JWT_TOKEN>
 
 **Access:** Public
 
-**Description:** Retrieve full details of a specific issue
-
 **Endpoint**
 
 `GET /api/issues/:id`
@@ -167,8 +139,6 @@ Authorization: <JWT_TOKEN>
 ### 6. Update Issue
 
 **Access:** Maintainer (any issue) OR Contributor (own issue, only if status is `open`)
-
-**Description:** Update issue title, description, or type
 
 **Endpoint**
 
@@ -184,8 +154,6 @@ Authorization: <JWT_TOKEN>
 
 **Access:** Maintainer only
 
-**Description:** Permanently remove an issue from the system
-
 **Endpoint**
 
 `DELETE /api/issues/:id`
@@ -196,18 +164,4 @@ Authorization: <JWT_TOKEN>
 Authorization: <JWT_TOKEN>
 ```
 
-**HTTP Status Codes**
 
-| Code  | Reason Phrase         | Usage                                                  |
-| ----- | --------------------- | ------------------------------------------------------ |
-| `200` | OK                    | Successful GET, PATCH, PUT, DELETE                     |
-| `201` | Created               | Successful POST (resource created)                     |
-| `204` | No Content            | Successful DELETE with no response body                |
-| `400` | Bad Request           | Validation errors, invalid input, duplicate resource   |
-| `401` | Unauthorized          | Missing, expired, or invalid JWT token                 |
-| `403` | Forbidden             | Valid token but insufficient role/permissions          |
-| `404` | Not Found             | Requested resource does not exist                      |
-| `409` | Conflict              | Business logic conflict (e.g., editing resolved issue) |
-| `500` | Internal Server Error | Unexpected server or database error                    |
-
----
