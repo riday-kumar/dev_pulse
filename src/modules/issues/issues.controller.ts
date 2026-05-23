@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { issuesService } from "./issues.service.js";
 import type { TUser } from "../../types/index.js";
+import sendResponse from "../../utility/sendResponse.js";
 
 const createIssues = async (req: Request, res: Response) => {
   //   console.log(req.body);
@@ -12,16 +13,18 @@ const createIssues = async (req: Request, res: Response) => {
       reporter_id,
     );
 
-    res.status(201).json({
+    sendResponse(res, {
+      statusCode: 201,
       success: true,
       message: "Issue Created successfully",
       data: result.rows[0],
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      statusCode: 500,
       success: false,
       message: error.message,
-      errors: error,
+      error: error,
     });
   }
 };
@@ -30,15 +33,17 @@ const getAllIssues = async (req: Request, res: Response) => {
   try {
     const result = await issuesService.getAllIssuesFromDB(req.query);
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      statusCode: 500,
       success: false,
       message: error.message,
-      errors: error,
+      error: error,
     });
   }
 };
@@ -51,21 +56,24 @@ const getSingleIssue = async (req: Request, res: Response) => {
 
     // console.log("from controller", result);
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       data: result,
     });
   } catch (error: any) {
     if (error.message == "No Issue Found") {
-      res.status(404).json({
+      sendResponse(res, {
+        statusCode: 404,
         success: false,
         message: error.message,
       });
     } else {
-      res.status(500).json({
+      sendResponse(res, {
+        statusCode: 500,
         success: false,
         message: error.message,
-        errors: error,
+        error: error,
       });
     }
   }
@@ -82,22 +90,24 @@ const updateIssue = async (req: Request, res: Response) => {
       reporter_role,
     );
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Issue updated successfully",
       data: result.rows[0],
     });
   } catch (error: any) {
     if (error.message == "Forbidden") {
-      res.status(403).json({
+      return sendResponse(res, {
+        statusCode: 403,
         success: false,
         message: error.message,
       });
     } else {
-      res.status(500).json({
+      sendResponse(res, {
+        statusCode: 500,
         success: false,
         message: error.message,
-        errors: error,
       });
     }
   }
@@ -109,21 +119,24 @@ const deleteIssue = async (req: Request, res: Response) => {
   try {
     const result = await issuesService.deleteIssueFromDB(id as string);
     if (result.rowCount !== 0) {
-      return res.status(404).json({
+      return sendResponse(res, {
+        statusCode: 404,
         success: false,
         message: "User Not Found",
       });
     }
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Issue deleted successfully",
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      statusCode: 500,
       success: false,
       message: error.message,
-      errors: error,
+      error: error,
     });
   }
 };
