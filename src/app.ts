@@ -4,12 +4,14 @@ import express, {
   type Request,
   type Response,
 } from "express";
+import cors from "cors";
 import { userRoute } from "./modules/user/user.route.js";
 import { issuesRoute } from "./modules/issues/issues.route.js";
 const app: Application = express();
 
 // middleware
 app.use(json());
+app.use(cors());
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
